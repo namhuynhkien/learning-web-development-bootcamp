@@ -9,10 +9,15 @@ app.set("view engine", "ejs");
 
 const port = 3000;
 
-mongoose.connect("mongodb://localhost/todo-app", {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+// mongoose.connect("mongodb://localhost/todo-app", {
+//   useNewUrlParser: true,
+//   useUnifiedTopology: true,
+// });
+
+mongoose.connect(
+  "mongodb+srv://todo-app-user:test-123@cluster0.o8kf3.mongodb.net/todo-appdb",
+  { useNewUrlParser: true }
+);
 
 const itemSchema = { name: String };
 const Item = mongoose.model("items", itemSchema);
