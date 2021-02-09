@@ -9,7 +9,8 @@ app.set("view engine", "ejs");
 app.use(express.static("public"));
 
 mongoose.connect(
-  "mongodb+srv://todo-app-user:test-123@cluster0.o8kf3.mongodb.net/wikiDB",
+  // "mongodb://localhost/wikiDB",
+  "mongodb+srv://todo-app-user:test123@cluster0.o8kf3.mongodb.net/WikiDB?retryWrites=true&w=majority",
   { useNewUrlParser: true, useUnifiedTopology: true },
   function (err) {
     if (!err) {
@@ -65,16 +66,53 @@ app
     });
   });
 
-app.route("/articles/:articleTitle").get(function (req, res) {
-  const articleTitle = req.params.articleTitle;
-  articleSchema.findOne({ title: articleTitle }, function (err, foundArticle) {
-    if (foundArticle) {
-      res.send(foundArticle);
-    } else {
-      res.send("No articles matching that title was found.");
-    }
+app
+  .route("/articles/:articleTitle")
+  .get(function (req, res) {
+    const articleTitle = req.params.articleTitle;
+    Article.findOne({ title: articleTitle }, function (err, foundArticle) {
+      if (foundArticle) {
+        res.send(foundArticle);
+      } else {
+        res.send("No articles matching that title was found.");
+      }
+    });
+  })
+  .put(function (req, res) {
+    Article.updateOne(
+      { title: req.params.articleTitle },
+      { title: req.body.title, content: req.body.content },
+      function (err) {
+        if (!err) {
+          res.send("Successfully updated article.");
+        } else {
+          res.send(err);
+        }
+      }
+    );
+  })
+  .patch(function (req, res) {
+    Article.updateOne(
+      { title: req.params.articleTitle },
+      { $set: req.body },
+      function (err) {
+        if (!err) {
+          res.send("Successfully updated corresponding article.");
+        } else {
+          res.send(err);
+        }
+      }
+    );
+  })
+  .delete(function (req, res) {
+    Article.deleteOne({ title: req.params.articleTitle }, function (err) {
+      if (!err) {
+        res.send("Successfully deleted article.");
+      } else {
+        res.send(err);
+      }
+    });
   });
-});
 
 app.listen(port, function () {
   console.log(`Start listening to port ${port}`);
